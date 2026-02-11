@@ -4,9 +4,6 @@
 *.tfstate.*
 crash.log
 
-# Terraform lock (optional to keep — but OK to ignore for now)
-.terraform.lock.hcl
-
 # Sensitive outputs
 outputs_sensitive.tf
 
