@@ -20,6 +20,7 @@ resource "aws_iam_role_policy" "rsu_policy" {
     Version = "2012-10-17"
     Statement = [
 
+      # DynamoDB permissions
       {
         Effect = "Allow"
         Action = [
@@ -30,6 +31,7 @@ resource "aws_iam_role_policy" "rsu_policy" {
         Resource = aws_dynamodb_table.rsu_state.arn
       },
 
+      # CloudWatch Logs permissions
       {
         Effect = "Allow"
         Action = [
@@ -37,8 +39,18 @@ resource "aws_iam_role_policy" "rsu_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "*"
+        Resource = "arn:aws:logs:*:*:*"
+      },
+
+      # ✅ NEW — Allow Lambda to send failed events to DLQ
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage"
+        ]
+        Resource = aws_sqs_queue.lambda_dlq.arn
       }
+
     ]
   })
 }

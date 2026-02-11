@@ -9,8 +9,9 @@ resource "aws_dynamodb_table" "rsu_state" {
   }
 
   server_side_encryption {
-    enabled = true
-  }
+  enabled     = true
+  kms_key_arn = aws_kms_key.rsu_key.arn
+}
 
   point_in_time_recovery {
     enabled = true
