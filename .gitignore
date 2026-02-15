@@ -13,3 +13,19 @@ lambda/*.zip
 # OS
 .DS_Store
 Thumbs.db
+
+# IoT certificates & keys
+*.pem
+*.key
+*.crt
+vehicle-demo/*.pem
+vehicle-demo/*.key
+vehicle-demo/*.crt
+
+# TLS / cert material
+*.p12
+*.pfx
+
+# Allow only code in vehicle-demo
+!vehicle-demo/*.py
+!vehicle-demo/README.md
