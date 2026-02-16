@@ -20,7 +20,7 @@ resource "aws_iam_role_policy" "rsu_policy" {
     Version = "2012-10-17"
     Statement = [
 
-      # DynamoDB permissions
+      # ✅ DynamoDB permissions
       {
         Effect = "Allow"
         Action = [
@@ -31,7 +31,19 @@ resource "aws_iam_role_policy" "rsu_policy" {
         Resource = aws_dynamodb_table.rsu_state.arn
       },
 
-      # CloudWatch Logs permissions
+      # ✅ KMS permissions (FIX for AccessDeniedException)
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
+        ]
+        Resource = aws_kms_key.rsu_key.arn
+      },
+
+      # ✅ CloudWatch Logs permissions
       {
         Effect = "Allow"
         Action = [
@@ -42,7 +54,7 @@ resource "aws_iam_role_policy" "rsu_policy" {
         Resource = "arn:aws:logs:*:*:*"
       },
 
-      # ✅ NEW — Allow Lambda to send failed events to DLQ
+      # ✅ Allow Lambda to send failed events to DLQ
       {
         Effect = "Allow"
         Action = [

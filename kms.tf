@@ -7,18 +7,34 @@ resource "aws_kms_key" "rsu_key" {
     Version = "2012-10-17"
     Statement = [
 
-      # Allow full access to account root
+      # 1️⃣ Root full access
       {
         Sid = "EnableRootPermissions"
         Effect = "Allow"
         Principal = {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         }
-        Action = "kms:*"
+        Action   = "kms:*"
         Resource = "*"
       },
 
-      # Allow CloudWatch Logs service to use the key
+      # 2️⃣ Allow Lambda execution role to use the key
+      {
+        Sid = "AllowLambdaUsage"
+        Effect = "Allow"
+        Principal = {
+          AWS = aws_iam_role.rsu_lambda_role.arn
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      },
+
+      # 3️⃣ Allow CloudWatch Logs service
       {
         Sid = "AllowCloudWatchLogs"
         Effect = "Allow"
@@ -33,6 +49,28 @@ resource "aws_kms_key" "rsu_key" {
           "kms:DescribeKey"
         ]
         Resource = "*"
+      },
+
+      # 4️⃣ ✅ Allow DynamoDB service (Corrected with condition)
+      {
+        Sid = "AllowDynamoDBUsage"
+        Effect = "Allow"
+        Principal = {
+          Service = "dynamodb.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "dynamodb.${var.aws_region}.amazonaws.com"
+          }
+        }
       }
 
     ]

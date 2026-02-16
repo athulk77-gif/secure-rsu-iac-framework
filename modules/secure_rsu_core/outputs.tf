@@ -1,7 +1,7 @@
-output "rsu_table_name" {
-  value = aws_dynamodb_table.rsu_state.name
+output "log_group_name" {
+  value = aws_cloudwatch_log_group.rsu_logs.name
 }
 
-output "rsu_table_arn" {
-  value = aws_dynamodb_table.rsu_state.arn
+output "log_group_arn" {
+  value = aws_cloudwatch_log_group.rsu_logs.arn
 }

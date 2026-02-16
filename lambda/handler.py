@@ -1,7 +1,7 @@
 import json
 import os
 import boto3
-from datetime import datetime
+import time
 
 ddb = boto3.resource("dynamodb")
 table = ddb.Table(os.environ["TABLE_NAME"])
@@ -9,18 +9,30 @@ table = ddb.Table(os.environ["TABLE_NAME"])
 
 def main(event, context):
 
-    rsu_id = event.get("rsu_id", "rsu-1")
-    speed = event.get("speed", 0)
+    print("📥 Received event:", json.dumps(event))
 
-    item = {
-        "rsu_id": rsu_id,
-        "last_speed": speed,
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    try:
+        rsu_id = str(event["rsu_id"])
+        speed = int(event["speed"])
+        lane = int(event.get("lane", 0))
+        timestamp = int(event.get("timestamp", int(time.time())))
 
-    table.put_item(Item=item)
+        item = {
+            "rsu_id": rsu_id,
+            "timestamp": timestamp,   # 🔑 sort key
+            "speed": speed,
+            "lane": lane
+        }
 
-    return {
-        "status": "ok",
-        "rsu": rsu_id
-    }
+        table.put_item(Item=item)
+
+        print("✅ PutItem success:", item)
+
+        return {
+            "statusCode": 200,
+            "body": "Item stored successfully"
+        }
+
+    except Exception as e:
+        print("❌ ERROR:", str(e))
+        raise e
